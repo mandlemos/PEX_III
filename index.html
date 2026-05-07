@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JOPF Serviços TI — Painel de Demandas</title>
+<meta name="description" content="Painel de controle de demandas da JOPF Serviços TI: cadastre clientes, serviços e acompanhe prazos com clareza." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --navy:#2d3a4f;
+    --navy-soft:#4a5a73;
+    --navy-deep:#1f2a3d;
+    --gold:#c9a86b;
+
+    --bg:#f6f7f9;
+    --surface:#f1f3f6;
+    --surface-elevated:#ffffff;
+    --foreground:#2a3242;
+    --muted:#eef0f4;
+    --muted-foreground:#6a7384;
+    --border:#e3e7ee;
+    --destructive:#c0392b;
+
+    --radius:.75rem;
+    --radius-sm:.5rem;
+    --radius-md:.625rem;
+    --radius-xl:1rem;
+
+    --shadow-soft:0 1px 2px rgba(45,58,79,.06), 0 4px 16px rgba(45,58,79,.06);
+    --shadow-elevated:0 4px 12px rgba(45,58,79,.08), 0 16px 40px rgba(45,58,79,.10);
+    --shadow-button:0 1px 2px rgba(31,42,61,.18), inset 0 1px 0 rgba(255,255,255,.08);
+
+    --gradient-navy:linear-gradient(135deg,var(--navy-deep),var(--navy-soft));
+    --gradient-surface:linear-gradient(180deg,var(--surface-elevated),var(--surface));
+    --transition:200ms cubic-bezier(.4,0,.2,1);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Jost',system-ui,sans-serif;letter-spacing:.005em;-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--foreground);line-height:1.55}
+  h1,h2,h3{font-weight:500;letter-spacing:-.01em}
+
+  /* Header */
+  header{
+    position:relative;overflow:hidden;color:#fff;
+    background:var(--gradient-navy);
+  }
+  header::after{
+    content:"";position:absolute;inset:0;opacity:.07;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 20% 20%, #fff 1px, transparent 1px),
+      radial-gradient(circle at 80% 60%, #fff 1px, transparent 1px);
+    background-size:40px 40px,60px 60px;
+  }
+  .header-inner{position:relative;max-width:1024px;margin:0 auto;padding:2.5rem 1.5rem;}
+  .brand{display:flex;align-items:center;gap:.75rem}
+  .brand-mark{
+    width:40px;height:40px;border-radius:.75rem;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);
+    font-weight:600;
+  }
+  .brand-name{font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;opacity:.8}
+  .header-title{margin-top:1rem;font-size:1.9rem;font-weight:300}
+  .header-sub{margin-top:.5rem;max-width:34rem;font-size:.95rem;opacity:.8}
+  @media(min-width:640px){
+    .header-inner{padding:3.5rem 1.5rem}
+    .header-title{font-size:2.25rem}
+  }
+
+  /* Layout */
+  main{max-width:1024px;margin:0 auto;padding:2rem 1rem}
+  @media(min-width:640px){main{padding:3rem 1.5rem}}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:2rem}
+  @media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr);gap:1rem}}
+  .stat{
+    background:var(--surface-elevated);border:1px solid var(--border);
+    border-radius:var(--radius-xl);padding:1.1rem 1.2rem;box-shadow:var(--shadow-soft);
+  }
+  .stat-label{font-size:.7rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-foreground)}
+  .stat-value{margin-top:.25rem;font-size:1.75rem;font-weight:300;color:var(--navy)}
+  .stat-value.alert{color:var(--destructive)}
+
+  /* Card surface */
+  .card-surface{
+    background:var(--gradient-surface);border:1px solid var(--border);
+    border-radius:var(--radius-xl);padding:1.75rem;box-shadow:var(--shadow-soft);margin-bottom:2rem;
+  }
+  @media(min-width:640px){.card-surface{padding:2.25rem}}
+
+  .eyebrow{font-size:.7rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-foreground)}
+  .section-title{font-size:1.25rem;color:var(--foreground);margin-top:.15rem}
+  @media(min-width:640px){.section-title{font-size:1.5rem}}
+
+  /* Form */
+  form{display:grid;gap:1.25rem;margin-top:1.5rem}
+  @media(min-width:640px){form{grid-template-columns:1fr 1fr}}
+  .field{display:flex;flex-direction:column;gap:.4rem}
+  .field-label{font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground)}
+  .input{
+    width:100%;padding:.75rem .95rem;background:var(--surface-elevated);
+    border:1px solid var(--border);border-radius:var(--radius-md);color:var(--foreground);
+    font-family:inherit;font-size:.95rem;transition:var(--transition);outline:none;
+  }
+  .input:hover{border-color:var(--navy-soft)}
+  .input:focus{border-color:var(--navy);box-shadow:0 0 0 4px rgba(45,58,79,.08)}
+  .submit-wrap{display:flex;align-items:flex-end}
+
+  /* Buttons */
+  .btn-primary{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;width:100%;
+    padding:.85rem 1.5rem;background:var(--gradient-navy);color:#fff;
+    border:1px solid var(--navy);border-radius:var(--radius-md);
+    font-family:inherit;font-size:.95rem;font-weight:500;letter-spacing:.02em;
+    cursor:pointer;box-shadow:var(--shadow-button);transition:var(--transition);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-elevated)}
+  .btn-primary:active{transform:translateY(0)}
+
+  .btn-ghost{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:.45rem .8rem;background:transparent;color:var(--muted-foreground);
+    border:1px solid var(--border);border-radius:var(--radius-sm);
+    font-size:.8rem;font-family:inherit;cursor:pointer;transition:var(--transition);
+  }
+  .btn-ghost:hover{color:var(--navy);border-color:var(--navy-soft);background:var(--surface)}
+
+  /* List */
+  .list{margin-top:1.5rem;display:flex;flex-direction:column;gap:.75rem;list-style:none}
+  .item{
+    background:var(--surface-elevated);border:1px solid var(--border);
+    border-radius:var(--radius-xl);padding:1rem;box-shadow:var(--shadow-soft);
+    transition:var(--transition);
+  }
+  .item:hover{transform:translateY(-2px);box-shadow:var(--shadow-elevated)}
+  @media(min-width:640px){.item{padding:1.25rem}}
+  .item-row{display:flex;flex-direction:column;gap:.75rem}
+  @media(min-width:640px){.item-row{flex-direction:row;align-items:center;justify-content:space-between;gap:1rem}}
+  .item-main{flex:1;min-width:0}
+  .item-title-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+  .item-title{font-size:1rem;font-weight:500;color:var(--foreground)}
+  .item-service{margin-top:.25rem;font-size:.875rem;color:var(--muted-foreground)}
+  .item-deadline{margin-top:.4rem;font-size:.78rem;color:var(--muted-foreground)}
+  .item-deadline.overdue{color:var(--destructive)}
+  .item-actions{display:flex;gap:.5rem;flex-shrink:0}
+
+  /* Badge */
+  .badge{
+    display:inline-flex;align-items:center;gap:.4rem;
+    padding:.15rem .65rem;border-radius:9999px;font-size:.7rem;font-weight:500;
+  }
+  .badge .dot{width:6px;height:6px;border-radius:50%}
+  .badge.aberto{background:#e6ebf3;color:var(--navy)}
+  .badge.aberto .dot{background:var(--navy-soft)}
+  .badge.andamento{background:#f5ecd9;color:#7a5a1a}
+  .badge.andamento .dot{background:#c9a86b}
+  .badge.concluido{background:#dff0e3;color:#2d6a45}
+  .badge.concluido .dot{background:#5fa873}
+
+  /* Empty */
+  .empty{
+    margin-top:1.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1px dashed var(--border);border-radius:var(--radius-xl);
+    padding:3rem 1rem;text-align:center;
+  }
+  .empty-icon{
+    width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--surface);color:var(--navy);font-size:1.1rem;
+  }
+  .empty-title{margin-top:.75rem;font-size:.9rem;font-weight:500;color:var(--foreground)}
+  .empty-sub{margin-top:.25rem;font-size:.78rem;color:var(--muted-foreground)}
+
+  footer{margin-top:3rem;text-align:center;font-size:.75rem;color:var(--muted-foreground)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark">J</div>
+        <span class="brand-name">JOPF Serviços TI</span>
+      </div>
+      <h1 class="header-title">Painel de Controle de Demandas</h1>
+      <p class="header-sub">Centralize clientes, serviços e prazos em uma única visão clara e organizada.</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat"><div class="stat-label">Total</div><div class="stat-value" id="stat-total">0</div></div>
+      <div class="stat"><div class="stat-label">Em aberto</div><div class="stat-value" id="stat-open">0</div></div>
+      <div class="stat"><div class="stat-label">Concluídas</div><div class="stat-value" id="stat-done">0</div></div>
+      <div class="stat"><div class="stat-label">Atrasadas</div><div class="stat-value" id="stat-overdue">0</div></div>
+    </section>
+
+    <!-- Form -->
+    <section class="card-surface">
+      <div class="eyebrow">Nova demanda</div>
+      <h2 class="section-title">Cadastrar nova atividade</h2>
+      <form id="form">
+        <label class="field">
+          <span class="field-label">Nome do Cliente</span>
+          <input class="input" id="client" placeholder="Ex: Maria Silva" required />
+        </label>
+        <label class="field">
+          <span class="field-label">Tipo de Serviço</span>
+          <select class="input" id="service" required>
+            <option value="">Selecione um serviço…</option>
+            <option>Gestão e Consultoria Financeira</option>
+            <option>Declaração de Imposto de Renda</option>
+            <option>Gestão de Documentos Contábeis</option>
+            <option>Business Intelligence com Power BI</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Data Limite (Prazo)</span>
+          <input class="input" type="date" id="deadline" required />
+        </label>
+        <div class="submit-wrap">
+          <button type="submit" class="btn-primary">Adicionar à lista</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- List -->
+    <section class="card-surface">
+      <div class="eyebrow">Acompanhamento</div>
+      <h2 class="section-title">Atividades em aberto</h2>
+      <div id="list-wrap"></div>
+    </section>
+
+    <footer>© <span id="year"></span> JOPF Serviços TI · Painel de gestão</footer>
+  </main>
+
+<script>
+  const STORAGE_KEY = "jopf.activities.v1";
+  const STATUS_CYCLE = ["Em aberto","Em andamento","Concluído"];
+  const BADGE_CLASS = {"Em aberto":"aberto","Em andamento":"andamento","Concluído":"concluido"};
+
+  let activities = [];
+  try { activities = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch {}
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const form = document.getElementById("form");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const client = document.getElementById("client").value.trim();
+    const service = document.getElementById("service").value;
+    const deadline = document.getElementById("deadline").value;
+    if (!client || !service || !deadline) return;
+    activities.unshift({
+      id: crypto.randomUUID(),
+      client, service, deadline,
+      status: "Em aberto",
+      createdAt: Date.now()
+    });
+    save(); render();
+    form.reset();
+  });
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(activities)); }
+
+  function daysUntil(iso){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const t = new Date(iso+"T00:00:00");
+    return Math.round((t-today)/86400000);
+  }
+  function formatDate(iso){
+    const [y,m,d] = iso.split("-"); return `${d}/${m}/${y}`;
+  }
+
+  function cycleStatus(id){
+    const a = activities.find(x=>x.id===id); if(!a) return;
+    const i = STATUS_CYCLE.indexOf(a.status);
+    a.status = STATUS_CYCLE[(i+1)%STATUS_CYCLE.length];
+    save(); render();
+  }
+  function remove(id){
+    activities = activities.filter(x=>x.id!==id);
+    save(); render();
+  }
+
+  function render(){
+    document.getElementById("stat-total").textContent = activities.length;
+    document.getElementById("stat-open").textContent = activities.filter(a=>a.status!=="Concluído").length;
+    document.getElementById("stat-done").textContent = activities.filter(a=>a.status==="Concluído").length;
+    const overdue = activities.filter(a=>a.status!=="Concluído" && daysUntil(a.deadline)<0).length;
+    const overdueEl = document.getElementById("stat-overdue");
+    overdueEl.textContent = overdue;
+    overdueEl.classList.toggle("alert", overdue>0);
+
+    const wrap = document.getElementById("list-wrap");
+    if (!activities.length){
+      wrap.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">✦</div>
+          <p class="empty-title">Nenhuma atividade cadastrada</p>
+          <p class="empty-sub">Use o formulário acima para adicionar a primeira demanda.</p>
+        </div>`;
+      return;
+    }
+    const ul = document.createElement("ul");
+    ul.className = "list";
+    activities.forEach(a=>{
+      const d = daysUntil(a.deadline);
+      const isOverdue = a.status!=="Concluído" && d<0;
+      const subInfo = d<0 ? `${Math.abs(d)} dia(s) em atraso` : d===0 ? "vence hoje" : `em ${d} dia(s)`;
+      const li = document.createElement("li");
+      li.className = "item";
+      li.innerHTML = `
+        <div class="item-row">
+          <div class="item-main">
+            <div class="item-title-row">
+              <span class="item-title"></span>
+              <span class="badge ${BADGE_CLASS[a.status]}"><span class="dot"></span>${a.status}</span>
+            </div>
+            <p class="item-service"></p>
+            <p class="item-deadline ${isOverdue?'overdue':''}">Prazo: ${formatDate(a.deadline)} · <span style="opacity:.8">${subInfo}</span></p>
+          </div>
+          <div class="item-actions">
+            <button class="btn-ghost" data-action="cycle">Avançar status</button>
+            <button class="btn-ghost" data-action="remove" aria-label="Remover" style="padding:.45rem .65rem">✕</button>
+          </div>
+        </div>`;
+      li.querySelector(".item-title").textContent = a.client;
+      li.querySelector(".item-service").textContent = a.service;
+      li.querySelector('[data-action="cycle"]').onclick = ()=>cycleStatus(a.id);
+      li.querySelector('[data-action="remove"]').onclick = ()=>remove(a.id);
+      ul.appendChild(li);
+    });
+    wrap.innerHTML = "";
+    wrap.appendChild(ul);
+  }
+
+  render();
+</script>
+</body>
+</html>
